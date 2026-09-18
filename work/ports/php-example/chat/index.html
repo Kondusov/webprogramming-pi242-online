@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Чат</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat {
+            width: 100%;
+            max-width: 600px;
+            height: 80vh;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header {
+            padding: 16px;
+            background: #4a76f5;
+            color: #fff;
+            font-weight: 600;
+        }
+        .chat-header span { font-size: 13px; opacity: .8; font-weight: 400; }
+        .messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .msg {
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 75%;
+            word-wrap: break-word;
+            font-size: 14px;
+        }
+        .msg.own {
+            align-self: flex-end;
+            background: #4a76f5;
+            color: #fff;
+        }
+        .msg.other {
+            align-self: flex-start;
+            background: #e9edf3;
+            color: #111;
+        }
+        .msg.system {
+            align-self: center;
+            background: transparent;
+            color: #888;
+            font-size: 12px;
+            font-style: italic;
+        }
+        .msg .meta {
+            display: block;
+            font-size: 11px;
+            opacity: .65;
+            margin-top: 4px;
+        }
+        .input-row {
+            display: flex;
+            border-top: 1px solid #eee;
+        }
+        .input-row input {
+            flex: 1;
+            border: none;
+            padding: 14px;
+            font-size: 15px;
+            outline: none;
+        }
+        .input-row button {
+            border: none;
+            background: #4a76f5;
+            color: #fff;
+            padding: 0 24px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .input-row button:hover { background: #3a63d8; }
+        .status { font-size: 12px; padding: 6px 16px; color: #888; }
+        .status.offline { color: #d33; }
+    </style>
+</head>
+<body>
+<div class="chat">
+    <div class="chat-header">
+        💬 WebSocket Чат <span id="status">подключение…</span>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-row">
+        <input id="input" type="text" placeholder="Введите сообщение…" autocomplete="off" disabled>
+        <button id="send" disabled>Отправить</button>
+    </div>
+</div>
+
+<script>
+    const messagesEl = document.getElementById('messages');
+    const inputEl    = document.getElementById('input');
+    const sendBtn    = document.getElementById('send');
+    const statusEl   = document.getElementById('status');
+
+    let ws;
+    let myId = null;
+
+    function connect() {
+        ws = new WebSocket('ws://localhost:8080');
+
+        ws.onopen = () => {
+            statusEl.textContent = 'онлайн';
+            statusEl.classList.remove('offline');
+            inputEl.disabled = false;
+            sendBtn.disabled = false;
+            inputEl.focus();
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'system') {
+                addMessage({ text: data.text, cls: 'system' });
+            } else if (data.type === 'message') {
+                // Определяем, наше ли это сообщение (по id из system-уведомления сервера сложно,
+                // поэтому для простоты ориентируемся на совпадение user с последним известным)
+                const isOwn = data.user === myId;
+                addMessage({
+                    text: data.text,
+                    cls: isOwn ? 'own' : 'other',
+                    meta: `#${data.user} • ${data.time}`,
+                });
+            }
+        };
+
+        ws.onclose = () => {
+            statusEl.textContent = 'отключено';
+            statusEl.classList.add('offline');
+            inputEl.disabled = true;
+            sendBtn.disabled = true;
+            // Переподключение через 2 секунды
+            setTimeout(connect, 2000);
+        };
+
+        ws.onerror = () => {
+            statusEl.textContent = 'ошибка соединения';
+            statusEl.classList.add('offline');
+        };
+    }
+
+    function addMessage({ text, cls, meta }) {
+        const div = document.createElement('div');
+        div.className = 'msg ' + cls;
+
+        const textNode = document.createTextNode(text);
+        div.appendChild(textNode);
+
+        if (meta) {
+            const metaEl = document.createElement('span');
+            metaEl.className = 'meta';
+            metaEl.textContent = meta;
+            div.appendChild(metaEl);
+        }
+
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function sendMessage() {
+        const text = inputEl.value.trim();
+        if (!text || ws.readyState !== WebSocket.OPEN) return;
+
+        // Сохраняем своё сообщение — сервер вернёт его всем, включая нас.
+        // Чтобы отметить "своё", запоминаем текст (упрощённо).
+        ws.send(JSON.stringify({ text }));
+
+        inputEl.value = '';
+        inputEl.focus();
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    connect();
+</script>
+</body>
+</html>
