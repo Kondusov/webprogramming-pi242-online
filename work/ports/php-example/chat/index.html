@@ -116,7 +116,7 @@
     let myId = null;
 
     function connect() {
-        ws = new WebSocket('ws://localhost:8080');
+        ws = new WebSocket('ws://localhost:8050');
 
         ws.onopen = () => {
             statusEl.textContent = 'онлайн';

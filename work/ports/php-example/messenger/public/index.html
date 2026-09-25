@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Мессенджер</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Экран входа -->
+<div class="auth-screen" id="authScreen">
+    <div class="auth-card">
+        <h1>Мессенджер</h1>
+        <div class="tabs">
+            <button class="tab active" data-tab="login">Вход</button>
+            <button class="tab" data-tab="register">Регистрация</button>
+        </div>
+        <form id="authForm">
+            <label>Имя пользователя</label>
+            <input id="authUsername" type="text" autocomplete="username" maxlength="32" required>
+            <label>Пароль</label>
+            <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required>
+            <button type="submit" id="authSubmit">Войти</button>
+        </form>
+        <div class="auth-error" id="authError"></div>
+    </div>
+</div>
+
+<!-- Основной интерфейс -->
+<div class="app hidden" id="app">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <span class="me" id="meName">—</span>
+            <button class="icon-btn" id="logoutBtn" title="Выйти">⎋</button>
+        </div>
+
+        <div class="actions">
+            <button class="action-btn" id="newGroupBtn" title="Создать группу">+ Группа</button>
+            <button class="action-btn" id="newChannelBtn" title="Создать канал">+ Канал</button>
+            <button class="action-btn" id="newDmBtn" title="Личный чат">+ Личный</button>
+        </div>
+
+        <div class="search">
+            <input id="chatFilter" type="text" placeholder="Поиск чата…">
+        </div>
+
+        <ul class="chat-list" id="chatList"></ul>
+    </aside>
+
+    <main class="main">
+        <header class="main-header">
+            <div>
+                <div class="chat-name" id="chatName">Выберите чат</div>
+                <div class="chat-sub" id="chatSub"></div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn hidden" id="membersBtn" title="Участники">👥</button>
+                <button class="icon-btn hidden" id="searchMsgBtn" title="Поиск сообщений">🔍</button>
+            </div>
+        </header>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="typing-indicator hidden" id="typingIndicator"></div>
+
+        <form class="composer hidden" id="composer">
+            <input id="messageInput" type="text" placeholder="Написать сообщение…" autocomplete="off" maxlength="4000">
+            <button type="submit">Отправить</button>
+        </form>
+
+        <div class="empty-state" id="emptyState">← Выберите или создайте чат</div>
+    </main>
+</div>
+
+<!-- Модалка: участники -->
+<div class="modal hidden" id="membersModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Участники</h3>
+            <button class="icon-btn" data-close>✕</button>
+        </div>
+        <ul class="members-list" id="membersList"></ul>
+        <div class="modal-footer">
+            <input id="addMemberInput" placeholder="Имя пользователя">
+            <button id="addMemberBtn">Добавить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модалка: поиск сообщений -->
+<div class="modal hidden" id="searchModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Поиск в чате</h3>
+            <button class="icon-btn" data-close>✕</button>
+        </div>
+        <div class="modal-footer">
+            <input id="searchMsgInput" placeholder="Что искать…">
+            <button id="searchMsgGo">Найти</button>
+        </div>
+        <ul class="search-results" id="searchResults"></ul>
+    </div>
+</div>
+
+<!-- Модалка: создание DM -->
+<div class="modal hidden" id="dmModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Личный чат</h3>
+            <button class="icon-btn" data-close>✕</button>
+        </div>
+        <div class="modal-footer">
+            <input id="dmSearchInput" placeholder="Имя пользователя">
+            <button id="dmSearchGo">Найти</button>
+        </div>
+        <ul class="search-results" id="dmSearchResults"></ul>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
