@@ -8,22 +8,89 @@
 <body>
 
 <!-- Экран входа -->
-<div class="auth-screen" id="authScreen">
-    <div class="auth-card">
-        <h1>Мессенджер</h1>
-        <div class="tabs">
-            <button class="tab active" data-tab="login">Вход</button>
-            <button class="tab" data-tab="register">Регистрация</button>
-        </div>
+<div id="authScreen">
+    <div id="authMain">
+        <button class="tab active" data-tab="login">Вход</button>
+        <button class="tab" data-tab="register">Регистрация</button>
         <form id="authForm">
-            <label>Имя пользователя</label>
-            <input id="authUsername" type="text" autocomplete="username" maxlength="32" required>
-            <label>Пароль</label>
-            <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required>
+            <input id="authEmail" type="email">
+            <input id="authUsername" type="text" required>
+            <input id="authPassword" type="password" required>
             <button type="submit" id="authSubmit">Войти</button>
+            <button type="button" id="forgotBtn">Забыли пароль?</button>
         </form>
-        <div class="auth-error" id="authError"></div>
+        <div id="authError"></div>
     </div>
+
+    <div id="verifyScreen" class="hidden">
+        <b id="verifyEmailLabel"></b>
+        <form id="verifyForm">
+            <input id="verifyCode">
+            <button type="submit">Подтвердить</button>
+            <button type="button" id="resendBtn">Отправить код повторно</button>
+            <button type="button" id="backBtn">← Назад</button>
+        </form>
+        <div id="verifyError"></div>
+    </div>
+
+    <div id="resetScreen" class="hidden">
+        <form id="resetRequestForm">
+            <input id="resetEmail" type="email">
+            <button type="submit">Отправить код</button>
+            <button type="button" data-back>← Назад</button>
+        </form>
+        <form id="resetConfirmForm" class="hidden">
+            <input id="resetCode">
+            <input id="resetPassword" type="password">
+            <button type="submit">Сменить пароль</button>
+        </form>
+        <div id="resetError"></div>
+    </div>
+</div>
+
+<div id="app" class="hidden">
+    <aside class="sidebar">
+        <span id="meName"></span>
+        <button id="logoutBtn">⎋</button>
+        <button id="newGroupBtn">+ Группа</button>
+        <button id="newChannelBtn">+ Канал</button>
+            <button id="newDmBtn">+ Личный</button>
+            <input id="chatFilter">
+        <ul id="chatList"></ul>
+    </aside>
+    <main class="main">
+        <div id="chatName">Выберите чат</div>
+        <div id="chatSub"></div>
+        <button id="voiceCallBtn" class="hidden">📞</button>
+        <button id="videoCallBtn" class="hidden">📹</button>
+        <button id="membersBtn" class="hidden">👥</button>
+        <button id="searchMsgBtn" class="hidden">🔍</button>
+        <div id="messages"></div>
+        <div id="typingIndicator" class="hidden"></div>
+        <form id="composer" class="hidden">
+            <input id="messageInput">
+            <button type="submit">Отправить</button>
+        </form>
+        <div id="emptyState">← Выберите или создайте чат</div>
+    </main>
+</div>
+
+
+<!-- Звонки -->
+<div id="incomingCallModal" class="modal hidden">
+    <h3 id="incomingFrom">Входящий звонок</h3>
+    <p id="incomingType"></p>
+    <button id="acceptCall">Принять</button>
+    <button id="rejectCall">Отклонить</button>
+</div>
+
+<div id="callScreen" class="hidden">
+    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo" autoplay playsinline muted></video>
+    <div id="callInfo"></div>
+    <button id="toggleMic">🎙</button>
+    <button id="toggleCam">📹</button>
+    <button id="hangupBtn">📵</button>
 </div>
 
 <!-- Основной интерфейс -->

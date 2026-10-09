@@ -1,0 +1,3 @@
+Переписали мессенджер на питон.
+Нужно починить(не работает) регистрация.
+см. https://github.com/Kondusov/webprogramming-pi242-online/tree/main/work/ports/python-example/messenger

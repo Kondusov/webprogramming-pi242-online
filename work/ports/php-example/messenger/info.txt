@@ -7,8 +7,8 @@ php server/ws-server.php
 Ожидаемый вывод:
 
 text
-Мессенджер запущен на ws://0.0.0.0:8080
-HTTP API для логина: http://localhost:8000/api.php
+Мессенджер запущен на ws://0.0.0.0:8000
+HTTP API для логина: http://localhost:80/api.php
 2. Запустите HTTP-сервер для фронтенда
 Из папки public/:
 

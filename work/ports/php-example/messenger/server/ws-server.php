@@ -10,7 +10,7 @@ require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/chats.php';
 
 $host = '0.0.0.0';
-$port = 8080;
+$port = 8000;
 $pingInterval = 30;
 $pongTimeout = 90;
 
@@ -22,7 +22,7 @@ socket_listen($server, 20);
 socket_set_nonblock($server);
 
 echo "Мессенджер запущен на ws://$host:$port\n";
-echo "HTTP API для логина: http://localhost:8000/api.php\n";
+echo "HTTP API для логина: http://localhost:80/api.php\n";
 
 /* ---------- Состояние ---------- */
 $clients = [];      // sockId => ['sock','userId','username','lastPong','typing']

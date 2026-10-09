@@ -3,7 +3,7 @@
    ============================================================ */
 
 const API = 'api.php';
-const WS_URL = 'ws://localhost:8080';
+const WS_URL = 'ws://localhost:8000';
 
 /* ---------- Состояние ---------- */
 let ws = null;
