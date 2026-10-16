@@ -1,0 +1,4 @@
+Ознакомьтесь с примерами задач на зачету
+https://github.com/Kondusov/webprogramming-pi242-online/tree/main/exam/tickets.txt
+
+Создайте текстовый документ - шпаргалку, с ответами на вопросы из билета.
