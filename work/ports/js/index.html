@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Сокеты на JS</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        #messages { list-style-type: none; padding: 0; max-height: 300px; overflow-y: auto; border: 1px solid #ccc; }
+        #messages li { padding: 8px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+    <h2>Мини-чат на WebSockets</h2>
+    <ul id="messages"></ul>
+    
+    <form id="form">
+        <input id="input" autocomplete="off" placeholder="Введите сообщение..." /><button>Отправить</button>
+    </form>
+
+    <!-- Подключаем клиентский скрипт Socket.io (сервер отдает его автоматически по этому пути) -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Инициализируем сокет-соединение. 
+        // Если вызвать io() без аргументов, он автоматически подключится к хосту, который отдал эту страницу.
+        const socket = io();
+
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
+
+        // Отправка сообщения на сервер при отправке формы
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); // Предотвращаем перезагрузку страницы
+            
+            if (input.value) {
+                // Эмитируем (отправляем) событие 'chat message' на сервер и передаем текст
+                socket.emit('chat message', input.value);
+                input.value = ''; // Очищаем поле ввода
+            }
+        });
+
+        // Слушаем событие 'chat message' от сервера.
+        // Оно срабатывает каждый раз, когда сервер рассылает чье-то сообщение.
+        socket.on('chat message', (msg) => {
+            const item = document.createElement('li');
+            item.textContent = msg;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight); // Скроллим вниз
+        });
+    </script>
+</body>
+</html>
