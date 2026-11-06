@@ -1,0 +1,49 @@
+Рассмотрите и попробуйте разобраться пошагово с примером работы сокета
+на nodejs - https://github.com/Kondusov/webprogramming-pi242-online/tree/main/work/ports/js
+/////////////////////////
+Добавьте:
+1. Персонализация (Никнеймы и ID)
+Сейчас все сообщения выглядят одинаково. Будет круче, если сервер будет знать, кто именно пишет.
+• На клиенте: Спрашивать имя при входе:javascript
+const username = prompt("Введите ваше имя:") || "Аноним";
+// Передаем имя серверу сразу при подключении (в метаданных)
+const socket = io({ auth: { username } });
+Используйте код с осторожностью.
+• На сервере: Читать это имя и прикреплять к сообщениям:javascript
+io.on('connection', (socket) => {
+    const username = socket.handshake.auth.username; // Получаем имя
+
+    socket.on('chat message', (msg) => {
+        // Рассылаем объект: имя + текст
+        io.emit('chat message', { username, text: msg });
+    });
+});
+
+2. Системные уведомления (Кто зашел / кто вышел)
+Пользователи должны видеть, когда в чате появляется кто-то новый.
+• На сервере: Рассылать уведомление в событиях подключения и отключения:javascript
+io.on('connection', (socket) => {
+    const username = socket.handshake.auth.username;
+
+    // Отправляет сообщение ВСЕМ, кроме самого подключившегося (broadcast)
+    socket.broadcast.emit('system message', `${username} вошел в чат`);
+
+    socket.on('disconnect', () => {
+        io.emit('system message', `${username} покинул чат`);
+    });
+});
+
+
+3. Статус «Пользователь печатает...»
+
+Классическая фишка современных мессенджеров, которая реализуется за пару строк.
+• На клиенте: Ловить ввод текста в инпуте:javascript
+input.addEventListener('input', () => {
+    socket.emit('typing');
+});
+Используйте код с осторожностью.
+• На сервере: Пересылать этот статус другим:javascript
+socket.on('typing', () => {
+    // Говорим всем остальным, что этот сокет сейчас что-то набирает
+    socket.broadcast.emit('user typing', socket.handshake.auth.username);
+});

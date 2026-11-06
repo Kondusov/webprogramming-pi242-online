@@ -21,9 +21,12 @@
     <!-- Подключаем клиентский скрипт Socket.io (сервер отдает его автоматически по этому пути) -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        const username = prompt("Введите ваше имя:") || "Аноним";
+        // Передаем имя серверу сразу при подключении (в метаданных)
+        const socket = io({ auth: { username } });
         // Инициализируем сокет-соединение. 
         // Если вызвать io() без аргументов, он автоматически подключится к хосту, который отдал эту страницу.
-        const socket = io();
+        //const socket = io();
 
         const form = document.getElementById('form');
         const input = document.getElementById('input');
@@ -44,7 +47,8 @@
         // Оно срабатывает каждый раз, когда сервер рассылает чье-то сообщение.
         socket.on('chat message', (msg) => {
             const item = document.createElement('li');
-            item.textContent = msg;
+            console.log(msg)
+            item.textContent = `Имя: ${msg.username}  - ${msg.text}`;
             messages.appendChild(item);
             window.scrollTo(0, document.body.scrollHeight); // Скроллим вниз
         });

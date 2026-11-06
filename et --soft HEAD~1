@@ -1,0 +1,261 @@
+[33mcommit 431d49ca6e0a2196c5fee838f55927892928a24b[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: work <kondusov.ru@gmail.com>
+Date:   Fri Nov 6 13:22:03 2026 +0300
+
+    xo
+
+[1mdiff --git a/.gitignore b/.gitignore[m
+[1mindex fe94eea..f12d17b 100644[m
+[1m--- a/.gitignore[m
+[1m+++ b/.gitignore[m
+[36m@@ -1 +1 @@[m
+[31m-work/ports/js/node_modules[m
+\ No newline at end of file[m
+[32m+[m[32mwork/ports/js/messenger/node_modules[m
+\ No newline at end of file[m
+[1mdiff --git a/dz/30102026.txt b/dz/30102026.txt[m
+[1mindex e69de29..f4e0f73 100644[m
+[1m--- a/dz/30102026.txt[m
+[1m+++ b/dz/30102026.txt[m
+[36m@@ -0,0 +1,49 @@[m
+[32m+[m[32mРассмотрите и попробуйте разобраться пошагово с примером работы сокета[m
+[32m+[m[32mна nodejs - https://github.com/Kondusov/webprogramming-pi242-online/tree/main/work/ports/js[m
+[32m+[m[32m/////////////////////////[m
+[32m+[m[32mДобавьте:[m
+[32m+[m[32m1. Персонализация (Никнеймы и ID)[m
+[32m+[m[32mСейчас все сообщения выглядят одинаково. Будет круче, если сервер будет знать, кто именно пишет.[m
+[32m+[m[32m• На клиенте: Спрашивать имя при входе:javascript[m
+[32m+[m[32mconst username = prompt("Введите ваше имя:") || "Аноним";[m
+[32m+[m[32m// Передаем имя серверу сразу при подключении (в метаданных)[m
+[32m+[m[32mconst socket = io({ auth: { username } });[m
+[32m+[m[32mИспользуйте код с осторожностью.[m
+[32m+[m[32m• На сервере: Читать это имя и прикреплять к сообщениям:javascript[m
+[32m+[m[32mio.on('connection', (socket) => {[m
+[32m+[m[32m    const username = socket.handshake.auth.username; // Получаем имя[m
+[32m+[m
+[32m+[m[32m    socket.on('chat message', (msg) => {[m
+[32m+[m[32m        // Рассылаем объект: имя + текст[m
+[32m+[m[32m        io.emit('chat message', { username, text: msg });[m
+[32m+[m[32m    });[m
+[32m+[m[32m});[m
+[32m+[m
+[32m+[m[32m2. Системные уведомления (Кто зашел / кто вышел)[m
+[32m+[m[32mПользователи должны видеть, когда в чате появляется кто-то новый.[m
+[32m+[m[32m• На сервере: Рассылать уведомление в событиях подключения и отключения:javascript[m
+[32m+[m[32mio.on('connection', (socket) => {[m
+[32m+[m[32m    const username = socket.handshake.auth.username;[m
+[32m+[m
+[32m+[m[32m    // Отправляет сообщение ВСЕМ, кроме самого подключившегося (broadcast)[m
+[32m+[m[32m    socket.broadcast.emit('system message', `${username} вошел в чат`);[m
+[32m+[m
+[32m+[m[32m    socket.on('disconnect', () => {[m
+[32m+[m[32m        io.emit('system message', `${username} покинул чат`);[m
+[32m+[m[32m    });[m
+[32m+[m[32m});[m
+[32m+[m
+[32m+[m
+[32m+[m[32m3. Статус «Пользователь печатает...»[m
+[32m+[m
+[32m+[m[32mКлассическая фишка современных мессенджеров, которая реализуется за пару строк.[m
+[32m+[m[32m• На клиенте: Ловить ввод текста в инпуте:javascript[m
+[32m+[m[32minput.addEventListener('input', () => {[m
+[32m+[m[32m    socket.emit('typing');[m
+[32m+[m[32m});[m
+[32m+[m[32mИспользуйте код с осторожностью.[m
+[32m+[m[32m• На сервере: Пересылать этот статус другим:javascript[m
+[32m+[m[32msocket.on('typing', () => {[m
+[32m+[m[32m    // Говорим всем остальным, что этот сокет сейчас что-то набирает[m
+[32m+[m[32m    socket.broadcast.emit('user typing', socket.handshake.auth.username);[m
+[32m+[m[32m});[m
+\ No newline at end of file[m
+[1mdiff --git a/work/ports/js/krest-nulls/index.html b/work/ports/js/krest-nulls/index.html[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2a0bdfd[m
+[1m--- /dev/null[m
+[1m+++ b/work/ports/js/krest-nulls/index.html[m
+[36m@@ -0,0 +1,31 @@[m
+[32m+[m[32m<!DOCTYPE html>[m
+[32m+[m[32m<html lang="en">[m
+[32m+[m[32m<head>[m
+[32m+[m[32m    <meta charset="UTF-8">[m
+[32m+[m[32m    <meta name="viewport" content="width=device-width, initial-scale=1.0">[m
+[32m+[m[32m    <title>Document</title>[m
+[32m+[m[32m    <style>[m
+[32m+[m[32m        table{[m
+[32m+[m[32m            border: 2px solid #6412;[m
+[32m+[m[32m        }[m
+[32m+[m[32m        table td{[m
+[32m+[m[32m            border: 1px solid #000;[m
+[32m+[m[32m            background-color: bisque;[m
+[32m+[m[32m            height: 150px;[m
+[32m+[m[32m            width: 150px;[m
+[32m+[m[32m            font-size: 5rem;[m
+[32m+[m[32m            text-align: center;[m
+[32m+[m[32m            font-family: cursive;[m
+[32m+[m[32m        }[m
+[32m+[m[32m    </style>[m
+[32m+[m[32m</head>[m
+[32m+[m[32m<body>[m
+[32m+[m[32m    <table>[m
+[32m+[m[32m        <tr><td id="1"></td><td id="2"></td><td id="3"></td></tr>[m
+[32m+[m[32m        <tr><td id="4"></td><td id="5"></td><td id="6"></td></tr>[m
+[32m+[m[32m        <tr><td id="7"></td><td id="8"></td><td id="9"></td></tr>[m
+[32m+[m[32m    </table>[m
+[32m+[m[32m    <h1 id="congratulation"></h1>[m
+[32m+[m[32m    <script src="main.js"></script>[m
+[32m+[m[32m</body>[m
+[32m+[m[32m</html>[m
+\ No newline at end of file[m
+[1mdiff --git a/work/ports/js/krest-nulls/main.js b/work/ports/js/krest-nulls/main.js[m
+[1mnew file mode 100644[m
+[1mindex 0000000..de6fbca[m
+[1m--- /dev/null[m
+[1m+++ b/work/ports/js/krest-nulls/main.js[m
+[36m@@ -0,0 +1,52 @@[m
+[32m+[m[32mlet congratulation =  document.getElementById('congratulation');[m
+[32m+[m[32mlet table = document.querySelector('table');[m
+[32m+[m[32mtable.addEventListener('click', step);[m
+[32m+[m[32mlet combinations = [[m
+[32m+[m[32m    [1,2,3], [4,5,6],[7,8,9],[m
+[32m+[m[32m    [1,4,7], [2,5,8],[3,6,9],[m
+[32m+[m[32m    [1,5,9], [3,5,7][m
+[32m+[m[32m];[m
+[32m+[m[32m// let mainUser =[m[41m [m
+[32m+[m[32m// let secondUser =[m[41m [m
+[32m+[m[32mlet switcher = 'X';[m
+[32m+[m[32mlet currentCombinationsX = [];[m
+[32m+[m[32mlet currentCombinationsO = [];[m
+[32m+[m[32mfunction step(event){[m
+[32m+[m[41m    [m
+[32m+[m[32m    //console.log(event);[m
+[32m+[m[32m    //console.log(event.target.getAttribute('id'));[m
+[32m+[m[32m    if(switcher=='O'){[m
+[32m+[m[32m        currentCombinationsO.push(Number(event.target.getAttribute('id')));[m
+[32m+[m[32m    }else{[m
+[32m+[m[32m        currentCombinationsX.push(Number(event.target.getAttribute('id')));[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    for(i=0; i<combinations.length; i++){[m
+[32m+[m[32m        // Проверка: все ли элементы currentCombinations есть в combinations?[m
+[32m+[m[32m        let counterX = 0;[m
+[32m+[m[32m        let counterO = 0;[m
+[32m+[m[32m        for(b=0; b<combinations[i].length; b++){[m
+[32m+[m[32m            console.log(['currentCombinations'+switcher[b]]);[m
+[32m+[m[32m           console.log(combinations[i][b]);[m
+[32m+[m[32m            if(['currentCombinations'+switcher[b]] == combinations[i][b]){[m
+[32m+[m[32m                ['counter'+[switcher]]+1;[m
+[32m+[m[32m                console.log(['counter'+[switcher]]);[m
+[32m+[m[32m            }[m
+[32m+[m[32m            console.log(counterX);[m
+[32m+[m[32m            if(counterX == 3 || counterO == 3){[m
+[32m+[m[32m                console.log('победа '+switcher)[m
+[32m+[m[32m                congratulation.textContent = `Победил ${switcher}`;[m
+[32m+[m[32m                //setTimeout(()=>location.reload(), 3000);[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+[32m+[m[32m    if(switcher != 'O'){[m
+[32m+[m[32m        event.target.textContent = "X";[m
+[32m+[m[32m        switcher = 'O';[m
+[32m+[m[32m    }else{[m
+[32m+[m[32m        event.target.textContent = "O";[m
+[32m+[m[32m        switcher ='X';[m
+[32m+[m[32m    }[m
+[32m+[m[32mconsole.log('Набор Х: '+currentCombinationsX);[m
+[32m+[m[32mconsole.log('Набор O: '+currentCombinationsO);[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/work/ports/js/krest-nulls/readmy.txt b/work/ports/js/krest-nulls/readmy.txt[m
+[1mnew file mode 100644[m
+[1mindex 0000000..15cb8a3[m
+[1m--- /dev/null[m
+[1m+++ b/work/ports/js/krest-nulls/readmy.txt[m
+[36m@@ -0,0 +1,11 @@[m
+[32m+[m[32mИгра крестики-ноллики на веб-сокетах.[m
+[32m+[m[32m--------------------------------------[m
+[32m+[m[32mДве роли.[m
+[32m+[m[32mПервый кто пошел - крестики.[m
+[32m+[m
+[32m+[m[32mВсего 9 ячеек (поле 3 на 3).[m
+[32m+[m[32mСледить за занятостью ячейки (и кем занята).[m
+[32m+[m
+[32m+[m[32mКогда все ячейки заняты - сообщать о победителе.[m
+[32m+[m
+[32m+[m[32mПобедителя определяем по заготовленному трафарету.[m
+[1mdiff --git a/work/ports/js/index.html b/work/ports/js/messenger/index.html[m
+[1msimilarity index 86%[m
+[1mrename from work/ports/js/index.html[m
+[1mrename to work/ports/js/messenger/index.html[m
+[1mindex 43badfc..2f37107 100644[m
+[1m--- a/work/ports/js/index.html[m
+[1m+++ b/work/ports/js/messenger/index.html[m
+[36m@@ -21,9 +21,12 @@[m
+     <!-- Подключаем клиентский скрипт Socket.io (сервер отдает его автоматически по этому пути) -->[m
+     <script src="/socket.io/socket.io.js"></script>[m
+     <script>[m
+[32m+[m[32m        const username = prompt("Введите ваше имя:") || "Аноним";[m
+[32m+[m[32m        // Передаем имя серверу сразу при подключении (в метаданных)[m
+[32m+[m[32m        const socket = io({ auth: { username } });[m
+         // Инициализируем сокет-соединение. [m
+         // Если вызвать io() без аргументов, он автоматически подключится к хосту, который отдал эту страницу.[m
+[31m-        const socket = io();[m
+[32m+[m[32m        //const socket = io();[m
+ [m
+         const form = document.getElementById('form');[m
+         const input = document.getElementById('input');[m
+[36m@@ -44,7 +47,8 @@[m
+         // Оно срабатывает каждый раз, когда сервер рассылает чье-то сообщение.[m
+         socket.on('chat message', (msg) => {[m
+             const item = document.createElement('li');[m
+[31m-            item.textContent = msg;[m
+[32m+[m[32m            console.log(msg)[m
+[32m+[m[32m            item.textContent = `Имя: ${msg.username}  - ${msg.text}`;[m
+             messages.appendChild(item);[m
+             window.scrollTo(0, document.body.scrollHeight); // Скроллим вниз[m
+         });[m
+[1mdiff --git a/work/ports/js/package-lock.json b/work/ports/js/messenger/package-lock.json[m
+[1msimilarity index 100%[m
+[1mrename from work/ports/js/package-lock.json[m
+[1mrename to work/ports/js/messenger/package-lock.json[m
+[1mdiff --git a/work/ports/js/package.json b/work/ports/js/messenger/package.json[m
+[1msimilarity index 100%[m
+[1mrename from work/ports/js/package.json[m
+[1mrename to work/ports/js/messenger/package.json[m
+[1mdiff --git a/work/ports/js/readmy.txt b/work/ports/js/messenger/readmy.txt[m
+[1msimilarity index 100%[m
+[1mrename from work/ports/js/readmy.txt[m
+[1mrename to work/ports/js/messenger/readmy.txt[m
+[1mdiff --git a/work/ports/js/server.js b/work/ports/js/messenger/server.js[m
+[1msimilarity index 63%[m
+[1mrename from work/ports/js/server.js[m
+[1mrename to work/ports/js/messenger/server.js[m
+[1mindex 31ea537..d089e29 100644[m
+[1m--- a/work/ports/js/server.js[m
+[1m+++ b/work/ports/js/messenger/server.js[m
+[36m@@ -16,19 +16,18 @@[m [mapp.get('/', (req, res) => {[m
+ [m
+ // Слушаем событие 'connection' — оно срабатывает каждый раз, когда к нам подключается новый пользователь[m
+ io.on('connection', (socket) => {[m
+[31m-    console.log(`Пользователь подключился: ${socket.id}`);[m
+[32m+[m[32m    const username = socket.handshake.auth.username; // Получаем имя[m
+ [m
+[31m-    // Слушаем кастомное событие 'chat message' от конкретного клиента[m
+     socket.on('chat message', (msg) => {[m
+[31m-        console.log(`Получено сообщение: ${msg}`);[m
+[31m-        [m
+[31m-        // Рассылаем это сообщение ВСЕМ подключенным пользователям (включая отправителя)[m
+[31m-        io.emit('chat message', msg);[m
+[32m+[m[32m        console.log(msg);[m
+[32m+[m[32m        // Рассылаем объект: имя + текст[m
+[32m+[m[32m        io.emit('chat message', { username, text: msg });[m
+     });[m
+[32m+[m[32m    // Отправляет сообщение ВСЕМ, кроме самого подключившегося (broadcast)[m
+[32m+[m[32m    socket.broadcast.emit('system message', `${username} вошел в чат`);[m
+ [m
+[31m-    // Слушаем системное событие отключения пользователя[m
+     socket.on('disconnect', () => {[m
+[31m-        console.log(`Пользователь отключился: ${socket.id}`);[m
+[32m+[m[32m        io.emit('system message', `${username} покинул чат`);[m
+     });[m
+ });[m
+ [m

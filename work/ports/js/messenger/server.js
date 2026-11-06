@@ -16,19 +16,18 @@ app.get('/', (req, res) => {
 
 // Слушаем событие 'connection' — оно срабатывает каждый раз, когда к нам подключается новый пользователь
 io.on('connection', (socket) => {
-    console.log(`Пользователь подключился: ${socket.id}`);
+    const username = socket.handshake.auth.username; // Получаем имя
 
-    // Слушаем кастомное событие 'chat message' от конкретного клиента
     socket.on('chat message', (msg) => {
-        console.log(`Получено сообщение: ${msg}`);
-        
-        // Рассылаем это сообщение ВСЕМ подключенным пользователям (включая отправителя)
-        io.emit('chat message', msg);
+        console.log(msg);
+        // Рассылаем объект: имя + текст
+        io.emit('chat message', { username, text: msg });
     });
+    // Отправляет сообщение ВСЕМ, кроме самого подключившегося (broadcast)
+    socket.broadcast.emit('system message', `${username} вошел в чат`);
 
-    // Слушаем системное событие отключения пользователя
     socket.on('disconnect', () => {
-        console.log(`Пользователь отключился: ${socket.id}`);
+        io.emit('system message', `${username} покинул чат`);
     });
 });
 
