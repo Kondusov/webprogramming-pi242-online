@@ -1,3 +1,4 @@
+
 let congratulation =  document.getElementById('congratulation');
 let table = document.querySelector('table');
 table.addEventListener('click', step);
@@ -12,41 +13,46 @@ let switcher = 'X';
 let currentCombinationsX = [];
 let currentCombinationsO = [];
 function step(event){
-    
-    //console.log(event);
-    //console.log(event.target.getAttribute('id'));
-    if(switcher=='O'){
-        currentCombinationsO.push(Number(event.target.getAttribute('id')));
-    }else{
-        currentCombinationsX.push(Number(event.target.getAttribute('id')));
-    }
+        if(event.target.textContent != ""){}
+        else{
+        //console.log(event);
+        //console.log(event.target.getAttribute('id'));
+        if(switcher=='O'){
+            currentCombinationsO.push(Number(event.target.getAttribute('id')));
+        }else{
+            currentCombinationsX.push(Number(event.target.getAttribute('id')));
+        }
 
-    for(i=0; i<combinations.length; i++){
-        // Проверка: все ли элементы currentCombinations есть в combinations?
-        let counterX = 0;
-        let counterO = 0;
-        for(b=0; b<combinations[i].length; b++){
-            console.log(['currentCombinations'+switcher[b]]);
-           console.log(combinations[i][b]);
-            if(['currentCombinations'+switcher[b]] == combinations[i][b]){
-                ['counter'+[switcher]]+1;
-                console.log(['counter'+[switcher]]);
-            }
-            console.log(counterX);
-            if(counterX == 3 || counterO == 3){
-                console.log('победа '+switcher)
-                congratulation.textContent = `Победил ${switcher}`;
-                //setTimeout(()=>location.reload(), 3000);
+        for(i=0; i<combinations.length; i++){
+            // Проверка: все ли элементы currentCombinations есть в combinations?
+            let counterX = 0;
+            let counterO = 0;
+            for(b=0; b<combinations[i].length; b++){
+                if(switcher =='O'){currentCombinations=currentCombinationsO}
+                else{currentCombinations=currentCombinationsX}
+
+                //console.log(currentCombinations);
+            console.log(combinations[i][b]);
+                if(combinations[i].includes(currentCombinations[b])){
+                    if(switcher== 'O'){
+                        counterO++;
+                    }else{counterX++}
+                }
+                if(counterX == 3 || counterO == 3){
+                    console.log('победа '+switcher)
+                    congratulation.textContent = `Победил ${switcher}`;
+                    //setTimeout(()=>location.reload(), 3000);
+                }
             }
         }
+        if(switcher != 'O'){
+            event.target.textContent = "X";
+            switcher = 'O';
+        }else{
+            event.target.textContent = "O";
+            switcher ='X';
+        }
+    console.log('Набор Х: '+currentCombinationsX);
+    console.log('Набор O: '+currentCombinationsO);
     }
-    if(switcher != 'O'){
-        event.target.textContent = "X";
-        switcher = 'O';
-    }else{
-        event.target.textContent = "O";
-        switcher ='X';
-    }
-console.log('Набор Х: '+currentCombinationsX);
-console.log('Набор O: '+currentCombinationsO);
 }
